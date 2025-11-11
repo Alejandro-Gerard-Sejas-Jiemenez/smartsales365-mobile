@@ -41,6 +41,8 @@ dependencies:
   material_design_icons_flutter: ^7.0.0
   cached_network_image: ^3.4.1
   flutter_stripe: ^11.3.0
+  speech_to_text: ^7.0.0
+  permission_handler: ^11.0.0
 
 dev_dependencies:
   flutter_test:

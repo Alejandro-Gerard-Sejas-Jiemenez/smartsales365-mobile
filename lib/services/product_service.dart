@@ -8,18 +8,29 @@ class ProductService {
   Future<List<Product>> getProducts() async {
     try {
       final token = await LocalStorage.getToken();
+      print('🔑 Token en ProductService: ${token?.substring(0, 20)}...');
+      
+      if (token == null || token.isEmpty) {
+        throw Exception('No hay sesión activa. Por favor inicia sesión nuevamente.');
+      }
+      
       final response = await http.get(
         Uri.parse('${ApiEndpoints.baseUrl}${ApiEndpoints.productos}'),
         headers: ApiHeaders.getHeaders(token: token),
       );
 
+      print('📡 Respuesta productos: ${response.statusCode}');
+      
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data.map((item) => Product.fromJson(item as Map<String, dynamic>)).toList();
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        throw Exception('Sesión expirada. Por favor inicia sesión nuevamente.');
       } else {
         throw Exception('Error al obtener productos: ${response.statusCode}');
       }
     } catch (e) {
+      print('❌ Error en getProducts: $e');
       throw Exception('Error de conexión: $e');
     }
   }

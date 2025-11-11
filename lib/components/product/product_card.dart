@@ -15,132 +15,121 @@ class ProductCard extends StatelessWidget {
     this.onAddToCart,
   }) : super(key: key);
 
-  TextStyle _priceStyle(BuildContext context) => TextStyle(
-    color: AppColors.primary,
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-  );
-
-  TextStyle _titleStyle(BuildContext context) => TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.bold,
-    height: 1.2, // Reduce el espaciado entre líneas
-  );
-
-  TextStyle _statusStyle(bool inStock) => TextStyle(
-    color: inStock ? AppColors.success : AppColors.error,
-    fontSize: 10,
-    fontWeight: FontWeight.w500,
-  );
-
 @override
 Widget build(BuildContext context) {
-  return Container(
-    width: 160,
-    height: 350, // Aumentada altura para eliminar el overflow
-    child: Card(
-      elevation: 2,
-      margin: EdgeInsets.all(8),
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(9),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          children: [
-            // Imagen del producto
-            SizedBox(
-              height: 150, // Altura ajustada para mejor proporción
-              width: double.infinity,
-              child: CachedNetworkImage(
-                imageUrl: product.imagenUrl ?? '',
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: Colors.grey[200],
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                    ),
+  return Card(
+    elevation: 2,
+    margin: EdgeInsets.zero,
+    clipBehavior: Clip.antiAlias,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: InkWell(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Imagen del producto
+          AspectRatio(
+            aspectRatio: 1.3,
+            child: CachedNetworkImage(
+              imageUrl: product.imagenUrl ?? '',
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                color: Colors.grey[200],
+                child: Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                   ),
                 ),
-                errorWidget: (context, url, error) => Container(
-                  color: Colors.grey[200],
-                  child: Icon(Icons.image_not_supported, color: Colors.grey),
-                ),
+              ),
+              errorWidget: (context, url, error) => Container(
+                color: Colors.grey[200],
+                child: Icon(Icons.image_not_supported, color: Colors.grey, size: 30),
               ),
             ),
-            
-            // Contenido
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8), // Reducido de 12 a 8
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Nombre del producto
-                    Text(
-                      product.nombre,
-                      style: _titleStyle(context),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+          ),
+          
+          // Contenido
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Nombre del producto
+                  Text(
+                    product.nombre,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      height: 1.1,
                     ),
-                    
-                    SizedBox(height: 4), // Reducido de 8 a 4
-                    
-                    // Precio
-                    Text(
-                      'Bs. ${product.precioVenta.toStringAsFixed(2)}',
-                      style: _priceStyle(context),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  
+                  SizedBox(height: 3),
+                  
+                  // Precio
+                  Text(
+                    'Bs. ${product.precioVenta.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
                     ),
-                    
-                    SizedBox(height: 4), // Reducido de 8 a 4
-                    
-                    // Stock
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: product.stockActual > 0 
-                          ? AppColors.success.withOpacity(0.1)
-                          : AppColors.error.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(4),
+                  ),
+                  
+                  SizedBox(height: 3),
+                  
+                  // Stock
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: product.stockActual > 0 
+                        ? AppColors.success.withOpacity(0.1)
+                        : AppColors.error.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      product.stockActual > 0 ? 'En stock' : 'Sin stock',
+                      style: TextStyle(
+                        color: product.stockActual > 0 ? AppColors.success : AppColors.error,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  
+                  Spacer(),
+                  
+                  // Botón de agregar al carrito
+                  SizedBox(
+                    width: double.infinity,
+                    height: 28,
+                    child: ElevatedButton(
+                      onPressed: product.stockActual > 0 ? onAddToCart : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
                       ),
                       child: Text(
-                        product.stockActual > 0 ? 'En stock' : 'Sin stock',
-                        style: _statusStyle(product.stockActual > 0),
+                        'Agregar al carrito',
+                        style: TextStyle(fontSize: 9),
                       ),
                     ),
-                    
-                    Spacer(), // Empuja el botón hacia abajo
-                    
-                    // Botón de agregar al carrito
-                    Container(
-                      width: double.infinity,
-                      height: 25, // Altura fija más pequeña
-                      child: ElevatedButton(
-                        onPressed: product.stockActual > 0 ? onAddToCart : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.zero, // Sin padding
-                          minimumSize: Size.zero, // Sin tamaño mínimo
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap, // Reduce el área de toque
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: Text(
-                          'Agregar al carrito',
-                          style: TextStyle(fontSize: 13), // Texto más pequeño
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     ),
   );

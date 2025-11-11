@@ -3,9 +3,12 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import '../../components/common/custom_app_bar.dart';
 import '../../components/cart/cart_item_card.dart';
 import '../../models/cart_item.dart';
+import '../../models/venta.dart';
 import '../../services/cart_service.dart';
 import '../../services/payment_service.dart';
+import '../../services/venta_service.dart';
 import '../../utils/app_colors.dart';
+import '../purchase/receipt_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -17,6 +20,7 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   final _cartService = CartService();
   final _paymentService = PaymentService();
+  final _ventaService = VentaService();
   bool _isLoading = true;
   String? _error;
   List<CartItem> _cartItems = [];
@@ -193,7 +197,10 @@ class _CartScreenState extends State<CartScreen> {
       // Confirmar el pago en el backend
       await _paymentService.confirmPayment(paymentData['payment_intent_id']);
       
-      // PASO 8: Limpiar el carrito localmente
+      // PASO 8: Obtener el detalle completo de la venta para mostrar el recibo
+      final ventaCompleta = await _ventaService.getDetalleVenta(ventaId);
+      
+      // PASO 9: Limpiar el carrito localmente
       setState(() {
         _cartItems.clear();
       });
@@ -204,12 +211,16 @@ class _CartScreenState extends State<CartScreen> {
         const SnackBar(
           content: Text('¡Pago realizado exitosamente!'),
           backgroundColor: AppColors.success,
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 2),
         ),
       );
       
-      // Navegar de regreso al home o a una pantalla de confirmación
-      Navigator.of(context).pop();
+      // Navegar a la pantalla de comprobante
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => ReceiptScreen(venta: ventaCompleta),
+        ),
+      );
       
     } on StripeException catch (e) {
       setState(() => _isLoading = false);
