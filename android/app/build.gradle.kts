@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.condominium_app"
+    namespace = "com.alejandro.smartsales365"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.condominium_app"
+        applicationId = "com.alejandro.smartsales365"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -43,4 +43,5 @@ flutter {
 }
 
 dependencies {
+    implementation("com.google.android.material:material:1.10.0")
 }

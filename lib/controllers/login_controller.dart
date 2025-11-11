@@ -6,8 +6,9 @@ class LoginController {
   Future<bool> login(String user, String password) async {
     final loginService = LoginService();
     try {
-      final success = await loginService.login(user, password);
-      return success;
+      final result = await loginService.login(user, password);
+      // Si result no es null, significa que el login fue exitoso
+      return result != null;
     } catch (e) {
       rethrow;
     }
