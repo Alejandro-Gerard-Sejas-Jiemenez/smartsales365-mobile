@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 import '../utils/api_constants.dart';
 import '../utils/local_storage.dart';
+import './push_notification_service.dart';
 
 class AuthService {
   static Future<User> login(String email, String password) async {
@@ -81,6 +82,20 @@ class AuthService {
           
           final user = User.fromJson(userDataMapped);
           await LocalStorage.saveUser(userDataMapped);
+          
+          // 🔔 REGISTRAR TOKEN FCM EN EL BACKEND
+          print('\n🔐 Login exitoso, registrando token FCM...');
+          try {
+            final registrado = await PushNotificationService.registrarTokenEnBackend(token);
+            if (registrado) {
+              print('✅✅✅ TOKEN FCM REGISTRADO EXITOSAMENTE ✅✅✅\n');
+            } else {
+              print('⚠️ No se pudo registrar el token FCM (no crítico)\n');
+            }
+          } catch (e) {
+            print('⚠️ Error al registrar token FCM: $e (no crítico)\n');
+          }
+          
           return user;
         } else {
           throw Exception('Error al obtener datos del usuario');
